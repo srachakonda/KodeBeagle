@@ -150,6 +150,7 @@ object Dependencies {
   val httpClient = "commons-httpclient" % "commons-httpclient" % "3.1"
   val config = "com.typesafe" % "config" % "1.2.1"
   val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "3.7.0.201502260915-r" intransitive()
+  val jararchivelib = "org.rauschig" % "jarchivelib" % "0.7.0"
   val commonsIO = "commons-io" % "commons-io" % "2.4"
   val esSpark = "org.elasticsearch" % "elasticsearch-spark_2.11" % "2.1.0.Beta4"
   val guava = "com.google.guava" % "guava" % "18.0"
@@ -176,7 +177,7 @@ object Dependencies {
   }
 
   val kodebeagle = Seq(akka, httpClient, scalastyle, spark, parserCombinator, scalaTest, slf4j, javaparser, json4s, config,
-    json4sJackson, jgit, commonsIO, esSpark, graphx, guava, compress, junit, rhino) ++ EclipseDeps.allDeps
+    json4sJackson, jgit, jararchivelib, commonsIO, esSpark, graphx, guava, compress, junit, rhino) ++ EclipseDeps.allDeps
 
   val ideaPluginTest = Seq(scalaTest, commonsIO)
   val ideaPlugin = Seq()
