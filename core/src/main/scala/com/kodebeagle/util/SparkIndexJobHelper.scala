@@ -169,14 +169,14 @@ object SparkIndexJobHelper {
 
   }
 
-  class LineSerializer extends CustomSerializer[Line](format => ( {
+  class LineSerializer extends CustomSerializer[Line](format => ({
     case JArray(List(JInt(line), JInt(startCol), JInt(endCol))) =>
       Line(line.toInt, startCol.toInt, endCol.toInt)
   }, {
     case line: Line => JArray(List(JInt(line.line), JInt(line.startCol), JInt(line.endCol)))
   }))
 
-  class ContextPropertySerializer extends CustomSerializer[ContextProperty](format => ( {
+  class ContextPropertySerializer extends CustomSerializer[ContextProperty](format => ({
     case JString(prop: String) => ContextProperty(prop)
   }, {
     case ctxProp: ContextProperty => JString(ctxProp.name)
