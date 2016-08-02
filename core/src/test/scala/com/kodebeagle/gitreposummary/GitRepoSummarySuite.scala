@@ -84,4 +84,5 @@ trait GitHubRepoMockSupport {
 
     Option(new MockedGithubRepo().init(new Configuration, "himukr/google-grp-scraper"))
   }
+
 }
