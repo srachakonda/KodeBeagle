@@ -16,25 +16,22 @@
  */
 package com.kodebeagle.gitreposummary
 
-import java.io.File
 import java.util.TimeZone
 
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConversions._
-import com.gitblit.models.Metric
 import com.gitblit.utils.MetricUtils
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.{Ref, Repository}
+import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import com.kodebeagle.util.SparkIndexJobHelper._
 
+import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks
 
 object GitRepoStatistics {
 
   def getRepoSummary(repository: Repository, description: String,
-                     owner: String, repoURL: String): String = {
+                     owner: String, repoURL: String): GitRepoSummary = {
     val commitDetailsList = ListBuffer[CommitDetails]()
     val git = new Git(repository)
     var noOfCommits = 0
@@ -47,36 +44,28 @@ object GitRepoStatistics {
         val loop = new Breaks
         loop.breakable {
           for (commit: org.eclipse.jgit.revwalk.RevCommit <- commits) {
-            if (noOfCommits==4){
+            if (noOfCommits == 4) {
               loop.break()
             }
             commitDetailsList +=
-              CommitDetails(commit.getAuthorIdent.getName,commit.getFullMessage,
-                commit.getCommitTime.toString,commit.toString)
+              CommitDetails(commit.getAuthorIdent.getName, commit.getFullMessage,
+                commit.getCommitTime.toString, commit.toString)
             noOfCommits += 1
           }
         }
-
-
       }
     } catch {
       case e: Exception => e.printStackTrace()
     }
-    val metrics= getDateMetrics(repository)
+
+    val metrics = getDateMetrics(repository)
     var stats = noOfCommits + " commits " + repository.getTags.size + " tags"
-    print(stats)
 
-    print(toJson(GitRepoSummary(
-      description, owner, "Last Changed", stats, repoURL,commitDetailsList.toList, metrics)))
-
-    print(toIndexTypeJson("java","statistics",GitRepoSummary(
-      description, owner, "Last Changed", stats, repoURL,commitDetailsList.toList, metrics),true))
-
-    toJson(GitRepoSummary(
-      description, owner, "Last Changed", stats, repoURL,commitDetailsList.toList, metrics))
+    GitRepoSummary(description, owner,
+      commitDetailsList.get(0).timeStamp, stats, repoURL, commitDetailsList.toList, metrics)
   }
 
-  def getDateMetrics(repository: Repository): List[MetricScala] =  {
+  def getDateMetrics(repository: Repository): List[MetricScala] = {
     val metrics = MetricUtils.getDateMetrics(repository,
       "refs/heads/master", true, "", TimeZone.getDefault)
     metrics.remove(0)
@@ -89,5 +78,5 @@ case class MetricScala(name: String, count: Double)
 case class GitRepoSummary(description: String, owner: String, lastChange: String,
                           stats: String, rpeositoryURl: String,
                           commitDetails: List[CommitDetails], metricsForChart: List[MetricScala])
-case class CommitDetails(authorName: String, commitMsg: String, timeStamp: String, commitId: String)
 
+case class CommitDetails(authorName: String, commitMsg: String, timeStamp: String, commitId: String)

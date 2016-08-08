@@ -24,7 +24,8 @@ import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
-class GitRepoSummarySuite extends FunSuite with BeforeAndAfterAll with GitHubRepoMockSupport{
+
+class GitRepoSummarySuite extends FunSuite with BeforeAndAfterAll with GitHubRepoMockSupport {
 
   var repo: Option[GithubRepo] = None
 
@@ -34,41 +35,15 @@ class GitRepoSummarySuite extends FunSuite with BeforeAndAfterAll with GitHubRep
 
   test("Repository Summary") {
     val files = repo.get.files
-    val jsonStringTest  = "{ \"index\" : { \"_index\" : " +
-      "\"gitreposummary\", \"_type\" : \"typegitreposummary\" }" +
-      " }\n{\"description\":\"It scraps all the topics " +
-      "present in any google group link\",\"owner\":" +
-      "\"himukr\",\"lastChange\":\"Last Changed\"," +
-      "\"stats\":\"4 commits 0 tags\",\"rpeositoryURl\":" +
-      "\"https://github.com/himukr/google-grp-scraper.git\"," +
-      "\"commitDetails\":[{\"authorName\":\"himanshu " +
-      "khantwal\",\"commitMsg\":\"updated\"," +
-      "\"timeStamp\":\"1466071223\",\"commitId\":" +
-      "\"commit 2f728a4485432ec8e3f77e8aa45ba16d1bd373d8 " +
-      "1466071223 ----sp\"},{\"authorName\":\"himanshu" +
-      " khantwal\",\"commitMsg\":\"changed the scroll class " +
-      "to the correct class\",\"timeStamp\":\"1453962955\"," +
-      "\"commitId\":\"commit df8ec70e7ef79cbc2f74861b1ed7b8ac93d341ca " +
-      "1453962955 ----sp\"},{\"authorName\":\"himukr\",\"commitMsg\":" +
-      "\"added ReadMe to the project\\n\",\"timeStamp\":" +
-      "\"1430141760\",\"commitId\":\"commit " +
-      "b709aa1df44a97c2bef77312f3b2e940ef9f270f " +
-      "1430141760 ----sp\"},{\"authorName\":\"himukr\"," +
-      "\"commitMsg\":\"file name should be less than 50-- fix\\n\"," +
-      "\"timeStamp\":\"1430141385\",\"commitId\":\"commit " +
-      "c4b4cab53a8e91412ebddf072f2f13945495d508 1430141385 " +
-      "----sp\"}],\"metricsForChart\":[{\"name\":\"2015-04\"," +
-      "\"count\":3.0},{\"name\":\"2016-01\",\"count\":1.0},{\"name\":\"2016-06\",\"count\":1.0}]}"
+    val timeStampCheck = "1466071223"
 
-
-
-
-    val resultJSONString = GitRepoStatistics.getRepoSummary(repo.get.repository,
-      "It scraps all the topics present in any google group link","himukr",
+    val gitRepoSummaryObj: GitRepoSummary = GitRepoStatistics.getRepoSummary(repo.get.repository,
+      "It scraps all the topics present in any google group link", "himukr",
       "https://github.com/himukr/google-grp-scraper.git")
-    assert(jsonStringTest.sameElements(resultJSONString))
-  }
 
+    val details: List[CommitDetails] = gitRepoSummaryObj.commitDetails
+    assert((details.head.timeStamp) == timeStampCheck)
+  }
 }
 
 trait GitHubRepoMockSupport {
